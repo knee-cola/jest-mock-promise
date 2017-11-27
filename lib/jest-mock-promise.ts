@@ -18,18 +18,7 @@
  * 
  */
 
- enum PromiseState {
-    pending, 
-    resolved,
-    rejected
- }
-
- type AnyFunction = (any)=>any;
-
- type HandlerType = {
-     then?:AnyFunction,
-     catch?:AnyFunction
- };
+ import {PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
 
 class JestMockPromise {
 
