@@ -1,0 +1,20 @@
+{
+  "name": "jest-mock-promise",
+  "version": "1.0.0",
+  "description": "Synchronous Promise Mock for testing with Jest",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "knee-cola <nikola.derezic@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.4.0",
+    "typescript": "^2.6.1",
+    "webpack": "^3.8.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knee-cola/jest-mock-promise"
+  }
+}
