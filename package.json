@@ -1,8 +1,9 @@
 {
   "name": "jest-mock-promise",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Synchronous Promise Mock for testing with Jest",
   "main": "src/jest-mock-promise.ts",
+  "module": "dist/jest-mock-promise.js",
   "scripts": {
     "build": "webpack -p"
   },
@@ -18,5 +19,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knee-cola/jest-mock-promise"
+  },
+  "bugs": {
+    "url": "git+https://github.com/knee-cola/jest-mock-promise/issues"
   }
 }
