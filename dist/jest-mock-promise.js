@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["JestMockPromise"] = factory();
+		exports["jest-mock-promise"] = factory();
 	else
-		root["JestMockPromise"] = factory();
+		root["jest-mock-promise"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache

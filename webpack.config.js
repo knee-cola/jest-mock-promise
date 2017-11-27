@@ -1,6 +1,6 @@
 const path = require('path');
 
-const srcDir = './src/';
+const srcDir = './lib/';
 const destDir = 'dist';
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname + '/' + destDir),
         filename: '[name].js',
-        library: 'JestMockPromise',
+        library: 'jest-mock-promise',
         libraryTarget: 'umd'
     },
 
