@@ -5,13 +5,13 @@ const destDir = 'dist';
 
 module.exports = {
     entry: {
-        "app": srcDir+"index.ts",
+        "jest-mock-promise": srcDir+"jest-mock-promise.ts",
     },
     output: {
         path: path.resolve(__dirname + '/' + destDir),
-        filename: 'index.js',
-        library: 'JestMockPromise',
-        libraryTarget: 'umd'
+        filename: '[name].js',
+//        library: 'JestMockPromise',
+//        libraryTarget: 'umd'
     },
 
     resolve: {
@@ -23,9 +23,12 @@ module.exports = {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
             {
-               test: /\.ts$/,
-               loader: "awesome-typescript-loader",
-               exclude: /node_modules/,
+                test: /\.ts$/,
+                loader: "awesome-typescript-loader",
+                exclude: /node_modules/,
+                options: {
+                    useBabel: true
+                }
             },
         ]
     }
