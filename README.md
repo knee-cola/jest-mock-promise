@@ -104,6 +104,7 @@ The first thing we need to do is install this component: `npm i --save-dev jest-
 
 Since our component uses `es6-promise`, we'll manually mock this dependency. We'll create a `__mocks__` directory inside our project root. There we'll create a `es6-promise.js` file with the following content:
 ```javascript
+// ./__mocks__/es6-promise.js
 import SyncPromise from './jest-sync-promise';
 
 // mocking the es6-promise, which is used by Axios
