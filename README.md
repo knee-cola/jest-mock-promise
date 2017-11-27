@@ -1,6 +1,6 @@
 # What's this?
 
-This is yet another synchronous implementation od JavaScript Promise, written to ease the pain of unit testing. It's written in TypeScript as a support class for an [Axios mock]().
+This is yet another synchronous implementation od JavaScript Promise, written to ease the pain of unit testing. It's written in TypeScript as a support class for an [Jest Mock Axios](https://www.npmjs.com/package/jest-mock-axios).
 
 # Why yet another?
 
