@@ -19,6 +19,8 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".json"]
     },
 
+    devtool: 'source-map',
+
     module: {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
@@ -27,7 +29,9 @@ module.exports = {
                 loader: "awesome-typescript-loader",
                 exclude: /node_modules/,
                 options: {
-                    useBabel: true
+                    useBabel: true,
+                    declaration: true,
+                    declarationDir: "./dist"
                 }
             },
         ]
