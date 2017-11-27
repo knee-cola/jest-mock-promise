@@ -55,7 +55,7 @@ If you've ever tried unit-testing async code, than you'll know how painfull that
 
 Synchronous Promise is usefull for testing an async component.
 
-We'll look at an exmaple of testing a method, which multiplies two numbers provided as a promise payload, after which it passes the result by calling a callback function. Here's the code of the component we want to test:
+We'll look at an example of testing a method, which multiplies two numbers provided as a promise payload, after which it passes the result by calling a callback function. Here's the code of the component we want to test:
 ```javascript
 // ./src/component.js
 import Promise from 'es6-promise';
@@ -100,15 +100,15 @@ describe('testing the multiply component', () => {
 As we can see, we need to have **a hard look** at the code to see the order in which our code gets executed. Can we make this better? Yes we can! In the following section we'll see how ...
 
 ## Applying the synchronous Promise 
-The first thing we need to do is install this component: `npm i --save-dev jest-sync-promise`
+The first thing we need to do is install this component: `npm i --save-dev jest-mock-promise`
 
-Since our component uses `es6-promise`, we'll manually mock this dependency. We'll create a `__mocks__` directory inside our project root. There we'll create a `es6-promise.js` file with the following content:
+Since our component uses `es6-promise`, we'll manually mock this dependency (if you don't know what manual mocking is, have a look at [Manual Mocks @ Jest](https://facebook.github.io/jest/docs/en/manual-mocks.html) ). We'll create a `__mocks__` directory inside our project root. There we'll create a `es6-promise.js` file with the following content:
 ```javascript
 // ./__mocks__/es6-promise.js
-import SyncPromise from './jest-sync-promise';
+import JestMockPromise from './jest-mock-promise';
 
 // mocking the es6-promise, which is used by Axios
-export { SyncPromise as Promise };
+export { JestMockPromise as Promise };
 ```
 Now that's set up, we can modify our test:
 ```javascript
