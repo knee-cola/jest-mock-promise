@@ -1,9 +1,12 @@
 {
   "name": "jest-mock-promise",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Synchronous Promise Mock for testing with Jest",
-  "main": "./lib/jest-mock-promise.ts",
-  "module": "./dist/jest-mock-promise.js",
+  "main": "dist/jest-mock-promise.js",
+  "types": "dist/jest-mock-promise.d.ts",
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "webpack -p"
   },
