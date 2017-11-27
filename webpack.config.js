@@ -10,8 +10,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname + '/' + destDir),
         filename: '[name].js',
-//        library: 'JestMockPromise',
-//        libraryTarget: 'umd'
+        library: 'JestMockPromise',
+        libraryTarget: 'umd'
     },
 
     resolve: {
