@@ -1,6 +1,6 @@
 {
   "name": "jest-mock-promise",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Synchronous Promise Mock for testing with Jest",
   "main": "src/index.ts",
   "scripts": {
