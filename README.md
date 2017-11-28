@@ -6,6 +6,14 @@ This is yet another synchronous implementation od JavaScript Promise, written to
 
 Because of "code first, search later" approach to solving problems.
 
+# What's in this document?
+
+* [How does it work?](#how-does-it-work)
+* [How to use it?](#how-to-use-it)
+  * [Testing in the async way](#testing-in-the-async-way)
+* [Applying the synchronous Promise](#applying-the-synchronous-promise)
+* [API](#api)
+
 # How does it work?
 
 Well' it works the same way a normal Promise would work, with the exception that does it right away and not at later time.
