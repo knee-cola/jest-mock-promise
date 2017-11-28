@@ -12,6 +12,7 @@ Because of "code first, search later" approach to solving problems.
 * [How to use it?](#how-to-use-it)
   * [First example - Traditional async test](#first-example---traditional-async-test)
   * [Second example - Applying the synchronous Promise](#second-example---applying-the-synchronous-promise )
+  * [Third example - Mocking Axios](#third-example---mocking-axios)
 * [API](#api)
 
 # How does it work?
