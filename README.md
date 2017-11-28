@@ -100,15 +100,18 @@ describe('testing the multiply component', () => {
         let callbackFn = jest.fn();
         let promise = new Promise((resolve, reject) {
             // providing two numbers which need to be multiplied
+            // as we know, although we have resolved the promise right away,
+            // `then` handlers will be called asnyc at later time
             resolve(1,2);
         });
 
         // calling the function we want to test
         onPromiseMultiply(promise, callbackFn);
 
-        // since the promise will be resolved async,
-        // we need to test our expectation inside a `then` handler
-        // and also return a promise to the Jest, so it knows
+        // Altought promise is already resolved, `then` handlers will
+        // be called asnyc at later time. That's why we need to put
+        // our expectation inside a `then` handler
+        // + we need to return a promise to the Jest, so it knows
         // we're doing some async testing
         return(promise.then(() => {
             expect(callbackFn).toHaveBeenCalledWith(3);
