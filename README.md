@@ -62,9 +62,13 @@ If you've ever tried unit-testing async code, than you'll know how painfull that
 
 # How to use it?
 
-Synchronous Promise wac created to simplify unit testing an async component. So to illustrate how it can be used, in the following example we are going to test a component, which multiplies two numbers provided as a payload of a promise. The result is returned a call to a callback function.
+Synchronous Promise was created to simplify unit testing an async component. So in the next two examples we'll have a look at how we can do just that - simplify a unit test.
 
-First let's have a look a the component we want to test:
+## What we'll be testing
+
+We are going to test a component, which multiplies two numbers provided as a payload of a promise. The result is returned a call to a callback function.
+
+The following snippet shows implementation of that component:
 ```javascript
 // ./src/component.js
 import Promise from 'es6-promise';
@@ -77,10 +81,14 @@ const onPromiseMultiply = (promise, callback) => {
 
 export {onPromiseMultiply};
 ```
-Now let's write a Jest tests. In our first example we'll create a test in a traditional async way ... just to show how unreadable it is. Then, in the second example, we'll simplify things by using `jest-mock-axios`.
+
+Now let's write some Jest tests.
 
 ## First example - Traditional async test
 
+In our first example we'll create a test in a traditional async way ... just to show how terible it is. Then, in the second example, we'll improve on the original idea by introducing `jest-mock-promise`.
+
+The next snippet contains a test written in traditional async way:
 ```javascript
 // ./src/__test__/component.spec.js
 import {onPromiseMultiply} from '../component.js';
@@ -108,7 +116,7 @@ describe('testing the multiply component', () => {
     });
 })
 ```
-As we can see, we need to have **a hard look** at the code to see the order in which our code gets executed. Can we make this better? Yes we can! In the following section we'll see how ...
+As we can see, it's not easy to see the order in which our code gets executed. Can we make this better? Yes we can! In the following section we'll see how ...
 
 ## Second example - Applying the synchronous Promise 
 The first thing we need to do is install this component: `npm i --save-dev jest-mock-promise`
@@ -118,7 +126,7 @@ Since our component uses `es6-promise`, we'll manually mock this dependency (if 
 // ./__mocks__/es6-promise.js
 import JestMockPromise from 'jest-mock-promise';
 
-// mocking the es6-promise, which is used by Axios
+// mocking the es6-promise, which is used by component we are testing
 export { JestMockPromise as Promise };
 ```
 Now that's set up, we can modify our test:
@@ -144,7 +152,7 @@ describe('testing the multiply component', () => {
     });
 })
 ```
-As we can see, there's no problem in reading this test! Hooray!
+As we can see, reading our code just became much easier! Hooray!
 
 ## Third example - Mocking Axios
 
