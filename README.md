@@ -11,7 +11,7 @@ Because of "code first, search later" approach to solving problems.
 * [How does it work?](#how-does-it-work)
 * [How to use it?](#how-to-use-it)
   * [Testing in the async way](#testing-in-the-async-way)
-* [Applying the synchronous Promise](#applying-the-synchronous-promise)
+  * [Applying the synchronous Promise](#applying-the-synchronous-promise)
 * [API](#api)
 
 # How does it work?
