@@ -17,7 +17,7 @@ Because of "code first, search later" approach to solving problems.
 
 # How does it work?
 
-Well' it works the same way a normal Promise would work, with the exception that does it right away and not at later time.
+It works the same way a normal Promise would, with the exception that does it right away (synchronously) and not at later time (async).
 
 Let's use the following example to see how a synchronous promise is different from a regular one:
 
