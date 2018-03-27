@@ -3,7 +3,7 @@ declare enum PromiseState {
     resolved = 1,
     rejected = 2,
 }
-declare type AnyFunction = (any) => any;
+declare type AnyFunction = (...args: any[]) => any;
 declare type HandlerType = {
     then?: AnyFunction;
     catch?: AnyFunction;
