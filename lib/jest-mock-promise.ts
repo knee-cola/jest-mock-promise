@@ -18,7 +18,7 @@
  * 
  */
 
- import {PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
+import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
 
 class JestMockPromise {
 
@@ -75,7 +75,7 @@ class JestMockPromise {
                 this.data = returnedValue;
             }
         };
-    };
+    }
 
     /**
      * Rejects the given promise
@@ -197,7 +197,7 @@ class JestMockPromise {
         return(new JestMockPromise((resolve, reject) => {
             setTimeout(reject(err), 0);
         }));
-    };
+    }
 }
 
 export default JestMockPromise;
