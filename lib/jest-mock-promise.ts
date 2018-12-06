@@ -1,21 +1,21 @@
 /**
  * Synchronous Promise, which gets settled (resolved or settled) in a synchronous manner.
- * 
+ *
  * `JestMockPromise` was written to simplify unit testing mocking (i.e. in [Jest](https://facebook.github.io/jest/) )
- * 
+ *
  * In order to simplify synchronious promise settling two additional methods
  * were added to the promise instance:
  *   - `resolve` = forces the given promise to be resolved right away
  *   - `reject` = forces the given promise to be rejected right away
- * 
+ *
  * By using these methods, we can write something like (provided that the Promise is mocked):
- * 
+ *
  *    let promise = ExternalComponent.doAyncWork();
  *    promise.resolve({ label: 'this is some mock data' });
- * 
+ *
  * @author   knee-cola<nikola.derezic@gmail.com>
  * @license  @license MIT License, http://www.opensource.org/licenses/MIT
- * 
+ *
  */
 
 import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
@@ -68,7 +68,7 @@ class JestMockPromise {
                 this.handlerIx++;
                 this.rejectFn(ex);
             }
-            
+
             if(returnedValue !== void 0) {
             // IF handler returned a value
             // > use it as the `data` for all the handlers which will be called next
@@ -82,7 +82,7 @@ class JestMockPromise {
      * @param err error object which is to be passed as a param to `catch` function
      */
     private rejectFn(err:any):void {
-        
+
         this.state = PromiseState.rejected;
         this.err = err;
 
@@ -156,11 +156,24 @@ class JestMockPromise {
     }
 
     /**
+     * Appends a finally handler callback to the promise,
+     * and returns a new promise resolving to the return
+     * value of the callback if it is called, or to its
+     * original fulfillment value if the promise is instead
+     * fulfilled.
+     * @param onFinally finally handler function
+     */
+    public finally(onFinally:AnyFunction) {
+        // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally#Description
+        this.then(onFinally, onFinally);
+    }
+
+    /**
      * Resolves the promise with the given promise data.
      * This is a non-standard method, which should be the last
      * one to be called, after all the fulfillment and rejection
      * handlers have been registered.
-     * @param {*} data 
+     * @param {*} data
      */
     public resolve(data?:any) {
         this.resolveFn(data);
@@ -171,7 +184,7 @@ class JestMockPromise {
      * This is a non-standard method, which should be the last
      * one to be called, after all the fulfillment and rejection
      * handlers have been registered.
-     * @param {*} data 
+     * @param {*} data
      */
     public reject(err?:any) {
         this.rejectFn(err);
