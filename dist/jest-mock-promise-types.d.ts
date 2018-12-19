@@ -7,5 +7,6 @@ declare type AnyFunction = (...args: any[]) => any;
 declare type HandlerType = {
     then?: AnyFunction;
     catch?: AnyFunction;
+    finally?: AnyFunction;
 };
 export { PromiseState, AnyFunction, HandlerType };

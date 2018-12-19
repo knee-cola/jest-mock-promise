@@ -75,6 +75,8 @@ class JestMockPromise {
                 this.data = returnedValue;
             }
         };
+
+        this.runAllFinal();
     }
 
     /**
@@ -98,6 +100,23 @@ class JestMockPromise {
                 this.resolveFn(returnedValue);
                 // stop the execution as soon as you run into a first catch element
                 break;
+            }
+        };
+
+        this.runAllFinal();
+    }
+
+    /**
+     * Runs all final handlers.
+     */
+    private runAllFinal():void {
+
+        for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
+            var el:HandlerType = this.handlers[this.handlerIx];
+
+            // stop the execution at first `catch` handler you run into
+            if(el.finally) {
+                el.finally();
             }
         };
     }
@@ -164,8 +183,14 @@ class JestMockPromise {
      * @param onFinally finally handler function
      */
     public finally(onFinally:AnyFunction) {
-        // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally#Description
-        this.then(onFinally, onFinally);
+        if (this.state === PromiseState.resolved || this.state === PromiseState.rejected) {
+            onFinally();
+        }
+        else {
+            this.handlers.push({ finally: onFinally });
+        }
+
+        return(this);
     }
 
     /**

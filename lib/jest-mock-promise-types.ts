@@ -1,5 +1,5 @@
 enum PromiseState {
-    pending, 
+    pending,
     resolved,
     rejected
  }
@@ -8,7 +8,8 @@ enum PromiseState {
 
  type HandlerType = {
      then?:AnyFunction,
-     catch?:AnyFunction
+     catch?:AnyFunction,
+     finally?:AnyFunction
  };
 
  export {PromiseState, AnyFunction, HandlerType }
