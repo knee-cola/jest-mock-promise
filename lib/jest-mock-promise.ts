@@ -97,13 +97,12 @@ class JestMockPromise {
                 returnedValue = el.catch(err);
                 // try executing `then` handlers which follow
                 this.handlerIx++;
+                this.runAllFinal();
                 this.resolveFn(returnedValue);
                 // stop the execution as soon as you run into a first catch element
                 break;
             }
         };
-
-        this.runAllFinal();
     }
 
     /**
