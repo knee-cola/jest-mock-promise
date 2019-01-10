@@ -1,14 +1,15 @@
 enum PromiseState {
-    pending, 
+    pending,
     resolved,
     rejected
- }
+}
 
- type AnyFunction = (...args: any[])=>any;
+type AnyFunction = (...args: any[]) => any;
 
- type HandlerType = {
-     then?:AnyFunction,
-     catch?:AnyFunction
- };
+type HandlerType = {
+    then?: AnyFunction,
+    catch?: AnyFunction,
+    finally?: AnyFunction
+};
 
- export {PromiseState, AnyFunction, HandlerType }
+export { PromiseState, AnyFunction, HandlerType }
