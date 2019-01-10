@@ -36,6 +36,10 @@ declare class JestMockPromise {
      */
     private rejectFn(err);
     /**
+     * Executes all finallies from the given promise
+     */
+    private finallyFn();
+    /**
      * Appends fulfillment and rejection handlers to the promise,
      * and returns a new promise resolving to the return value of
      * the called handler, or to its original settled value if the
@@ -54,6 +58,15 @@ declare class JestMockPromise {
      * @param onRejected rejection handler function
      */
     catch(onRejected: AnyFunction): this;
+    /**
+     * Appends a finally handler callback to the promise,
+     * and returns a new promise resolving to the return
+     * value of the callback if it is called, or to its
+     * original fulfillment value if the promise is instead
+     * fulfilled.
+     * @param onFinally finally handler function
+     */
+    finally(onFinally: AnyFunction): this;
     /**
      * Resolves the promise with the given promise data.
      * This is a non-standard method, which should be the last
