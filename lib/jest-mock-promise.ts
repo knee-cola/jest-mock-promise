@@ -92,7 +92,13 @@ class JestMockPromise {
                 returnedValue:any;
 
             if(el.catch) {
-                returnedValue = el.catch(err);
+                try {
+                    // Catch handlers can rethrow.
+                    returnedValue = el.catch(err);
+                } catch(ex) {
+                    this.handlerIx++;
+                    this.rejectFn(ex);
+                }
                 // try executing `then` handlers which follow
                 this.handlerIx++;
                 this.resolveFn(returnedValue);
@@ -112,7 +118,6 @@ class JestMockPromise {
      * @param onRejected rejection handler function
      */
     public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise {
-
         // if the promise is already settled (resolved or rejected)
         // > call the apropriate handler
         switch(this.state) {
