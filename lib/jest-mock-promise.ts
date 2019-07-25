@@ -20,11 +20,11 @@
 
 import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
 
-class JestMockPromise {
+class JestMockPromise<T> {
 
-    private handlers:Array<HandlerType>;
+    private handlers:Array<HandlerType<T>>;
     private handlerIx:number;
-    private data:any;
+    private data:T;
     private err:any;
     private state:PromiseState;
 
@@ -44,15 +44,15 @@ class JestMockPromise {
      * Resolves the given promise
      * @param data data which should be passed to `then` handler functions
      */
-    private resolveFn(data:any):void {
+    private resolveFn(data:T):void {
 
         this.data = data;
         this.state = PromiseState.resolved;
         this.err = void 0;
 
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType = this.handlers[this.handlerIx];
-            var returnedValue:any;
+            var el:HandlerType<T> = this.handlers[this.handlerIx];
+            var returnedValue:T;
 
             // stop the execution at first `catch` handler you run into
             if(el.catch) {
@@ -88,7 +88,7 @@ class JestMockPromise {
 
         // find the first `catch` handler and call it
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType = this.handlers[this.handlerIx],
+            var el:HandlerType<T> = this.handlers[this.handlerIx],
                 returnedValue:any;
 
             if(el.catch) {
@@ -111,7 +111,7 @@ class JestMockPromise {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise {
+    public then(onFulfilled:AnyFunction<T>, onRejected?:AnyFunction<T>):JestMockPromise<T> {
 
         // if the promise is already settled (resolved or rejected)
         // > call the apropriate handler
@@ -143,7 +143,7 @@ class JestMockPromise {
      * fulfilled.
      * @param onRejected rejection handler function
      */
-    public catch(onRejected:AnyFunction) {
+    public catch(onRejected:AnyFunction<T>) {
         // if the promise is already rejected
         // > call the handler right away
         if(this.state === PromiseState.resolved) {
@@ -162,7 +162,7 @@ class JestMockPromise {
      * handlers have been registered.
      * @param {*} data 
      */
-    public resolve(data?:any) {
+    public resolve(data?:T) {
         this.resolveFn(data);
     }
 
@@ -181,7 +181,7 @@ class JestMockPromise {
      * Creates a resolved promise with the given data
      * @param data data which should be passed to `then` handler functions
      */
-    static resolve(data?:any):JestMockPromise {
+    static resolve<T>(data?:T):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.resolve` will be executed async ... for sync execution call `resolve` method on an instance of `Promise`');
         return(new JestMockPromise((resolve, reject) => {
             setTimeout(resolve(data), 0);
@@ -192,7 +192,7 @@ class JestMockPromise {
      * Creates a rejected promise with the given data
      * @param err error object which is to be passed as a param to `catch` function
      */
-    static reject(err?:any):JestMockPromise {
+    static reject<T=any>(err?:any):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.reject` will be executed async ... for sync execution call `reject` method on an instance of `Promise`');
         return(new JestMockPromise((resolve, reject) => {
             setTimeout(reject(err), 0);

@@ -4,11 +4,11 @@ enum PromiseState {
     rejected
  }
 
- type AnyFunction = (...args: any[])=>any;
+ type AnyFunction<ReturnType> = (...args: any[]) => ReturnType
 
- type HandlerType = {
-     then?:AnyFunction,
-     catch?:AnyFunction
- };
+ type HandlerType<T> = {
+     then?: AnyFunction<T>
+     catch?: AnyFunction<any>
+ } 
 
  export {PromiseState, AnyFunction, HandlerType }
