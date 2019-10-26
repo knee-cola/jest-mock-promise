@@ -42,17 +42,15 @@ class JestMockPromise {
 
     /**
      * Resolves the given promise
-     * @param data data which should be passed to `then` handler functions
+     * @param value data which should be passed to `then` handler functions
      */
-    private resolveFn(data:any):void {
+    private resolveFn(value:any):void {
 
-        this.data = data;
         this.state = PromiseState.resolved;
         this.err = void 0;
 
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
             var el:HandlerType = this.handlers[this.handlerIx];
-            var returnedValue:any;
 
             // stop the execution at first `catch` handler you run into
             if(el.catch) {
@@ -60,21 +58,24 @@ class JestMockPromise {
             }
 
             try {
-                // calling a `then` handler
-                returnedValue = el.then(this.data);
+                if(el.then) {
+                    // calling a `then` handler
+                    value = el.then(value);
+                } else if(el.finally) {
+                    // calling a `finally` handler
+                    el.finally(); // finally doesn't receive any data
+                    value = void 0; // finally doesn't return any value - it becomes null
+                }
             } catch(ex) {
-                // in case `then` handler throws an error
+                // in case `then` or a `finally` handler throws an error
                 // > pass it down to a first `catch` handler
                 this.handlerIx++;
                 this.rejectFn(ex);
             }
-            
-            if(returnedValue !== void 0) {
-            // IF handler returned a value
-            // > use it as the `data` for all the handlers which will be called next
-                this.data = returnedValue;
-            }
         };
+
+        // call all the `finally` which follow
+        this.callFinally();
     }
 
     /**
@@ -93,13 +94,52 @@ class JestMockPromise {
 
             if(el.catch) {
                 returnedValue = el.catch(err);
-                // try executing `then` handlers which follow
+                // try executing `then`/`finally` handlers which follow
                 this.handlerIx++;
                 this.resolveFn(returnedValue);
                 // stop the execution as soon as you run into a first catch element
                 break;
             }
         };
+
+        // call all the `finally` which follow
+        this.callFinally();
+    }
+
+    /**
+     * Calls `finally` handlers
+     */
+    private callFinally():void {
+
+        /** is set to `true` after a successful `finally` call */
+        let callNextThen = false;
+
+        // find the first `finally` and call it
+        for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
+
+            let el:HandlerType = this.handlers[this.handlerIx];
+            
+            try {
+                if(el.finally) {
+                    // calling a `finally` handler
+                    el.finally(); // finally doesn't receive any data
+                    callNextThen = true; // if `then` is next - call it
+                } else if(el.then && callNextThen) {
+                    // if you run into `then` right after finally > let the dedicated handler process it
+                    this.resolveFn(void 0);
+                    break; // the execution will continue from `resolveFn`
+                } else if(el.catch) {
+                    callNextThen = false;
+                    continue; // skipping `catch`
+                }
+            } catch(ex) {
+                // in case `then` or a `finally` handler throws an error
+                // > pass it down to a first `catch` handler
+                this.handlerIx++;
+                this.rejectFn(ex);
+                break; // the execution will continue from `rejectFn`
+            }
+        }
     }
 
     /**
@@ -150,6 +190,22 @@ class JestMockPromise {
             onRejected(this.err);
         } else {
             this.handlers.push({ catch: onRejected });
+        }
+
+        return(this);
+    }
+
+    /**
+     * Appends a finally handler callback to the promise
+     * @param onFinally finally handler function
+     */
+    public finally(onFinally:AnyFunction) {
+        // if the promise is already resolved or rejected
+        // > call the handler right away
+        if(this.state !== PromiseState.pending) {
+            onFinally();
+        } else {
+            this.handlers.push({ finally: onFinally });
         }
 
         return(this);
