@@ -146,7 +146,7 @@ class JestMockPromise {
     public catch(onRejected:AnyFunction) {
         // if the promise is already rejected
         // > call the handler right away
-        if(this.state === PromiseState.resolved) {
+        if(this.state === PromiseState.rejected) {
             onRejected(this.err);
         } else {
             this.handlers.push({ catch: onRejected });
