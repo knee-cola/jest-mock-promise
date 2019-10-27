@@ -56,11 +56,7 @@ class JestMockPromise {
             var el:HandlerType = this.handlers[this.handlerIx];
 
             // stop the execution at first `catch` handler you run into
-            if(el.catch) {
-                break;
-            }
-
-            if(el.finally) {
+            if(el.catch || el.finally) {
                 this.callFinally();
                 return;
             }

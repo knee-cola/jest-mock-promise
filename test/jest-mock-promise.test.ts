@@ -7,6 +7,7 @@ test('`finally` must be called with no arguments after if a promise is resolved'
     const thenHandler = jest.fn();
 
     promise.then(thenHandler);
+    promise.catch(() => {});
     promise.finally(finallyHandler);
 
     promise.resolve('some data');
@@ -24,6 +25,7 @@ test('`finally` must be called after if a promise is rejected', () => {
     const finallyHandler = jest.fn();
     const catchHandler = jest.fn();
 
+    promise.then(() => {});
     promise.catch(catchHandler);
     promise.finally(finallyHandler);
     promise.reject('some error data');
