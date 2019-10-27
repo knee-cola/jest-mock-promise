@@ -47,6 +47,8 @@ class JestMockPromise {
      */
     private resolveFn(value?:any):void {
 
+        this.data = value;
+
         this.state = PromiseState.resolved;
         this.err = void 0;
 
