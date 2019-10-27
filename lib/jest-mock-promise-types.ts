@@ -8,7 +8,8 @@ enum PromiseState {
 
  type HandlerType<T> = {
      then?: AnyFunction<T>
-     catch?: AnyFunction<any>
+     catch?: AnyFunction<any>,
+     finally?:AnyFunction<any>,
  } 
 
  export {PromiseState, AnyFunction, HandlerType }

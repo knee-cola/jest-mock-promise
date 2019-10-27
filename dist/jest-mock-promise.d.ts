@@ -27,14 +27,18 @@ declare class JestMockPromise {
     constructor(callbackFn?: (x?: any, y?: any) => any);
     /**
      * Resolves the given promise
-     * @param data data which should be passed to `then` handler functions
+     * @param value data which should be passed to `then` handler functions
      */
-    private resolveFn(data);
+    private resolveFn;
     /**
      * Rejects the given promise
      * @param err error object which is to be passed as a param to `catch` function
      */
-    private rejectFn(err);
+    private rejectFn;
+    /**
+     * Calls `finally` handlers
+     */
+    private callFinally;
     /**
      * Appends fulfillment and rejection handlers to the promise,
      * and returns a new promise resolving to the return value of
@@ -54,6 +58,11 @@ declare class JestMockPromise {
      * @param onRejected rejection handler function
      */
     catch(onRejected: AnyFunction): this;
+    /**
+     * Appends a finally handler callback to the promise
+     * @param onFinally finally handler function
+     */
+    finally(onFinally: AnyFunction): this;
     /**
      * Resolves the promise with the given promise data.
      * This is a non-standard method, which should be the last
