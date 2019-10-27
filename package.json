@@ -1,15 +1,19 @@
 {
   "name": "jest-mock-promise",
-  "version": "1.0.23",
+  "version": "1.1.0",
   "description": "Synchronous Promise Mock for testing with Jest",
   "main": "dist/jest-mock-promise.js",
   "types": "dist/jest-mock-promise.d.ts",
   "scripts": {
-    "build": "webpack -p"
+    "build": "webpack -p",
+    "test": "jest --watchAll"
   },
   "author": "knee-cola <nikola.derezic@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^24.0.20",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "ts-loader": "^3.1.1",
     "typescript": "^2.6.1",
     "webpack": "^3.8.1"
