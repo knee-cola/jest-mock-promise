@@ -29,16 +29,16 @@ declare class JestMockPromise {
      * Resolves the given promise
      * @param value data which should be passed to `then` handler functions
      */
-    private resolveFn(value?);
+    private resolveFn;
     /**
      * Rejects the given promise
      * @param err error object which is to be passed as a param to `catch` function
      */
-    private rejectFn(err);
+    private rejectFn;
     /**
      * Calls `finally` handlers
      */
-    private callFinally();
+    private callFinally;
     /**
      * Appends fulfillment and rejection handlers to the promise,
      * and returns a new promise resolving to the return value of
