@@ -19,6 +19,7 @@
  */
 
 import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
+import { returnStatement } from '@babel/types';
 
 class JestMockPromise {
 
@@ -44,7 +45,7 @@ class JestMockPromise {
      * Resolves the given promise
      * @param value data which should be passed to `then` handler functions
      */
-    private resolveFn(value:any):void {
+    private resolveFn(value?:any):void {
 
         this.state = PromiseState.resolved;
         this.err = void 0;
@@ -57,15 +58,14 @@ class JestMockPromise {
                 break;
             }
 
+            if(el.finally) {
+                this.callFinally();
+                return;
+            }
+
             try {
-                if(el.then) {
-                    // calling a `then` handler
-                    value = el.then(value);
-                } else if(el.finally) {
-                    // calling a `finally` handler
-                    el.finally(); // finally doesn't receive any data
-                    value = void 0; // finally doesn't return any value - it becomes null
-                }
+                // calling a `then` handler
+                value = el.then(value);
             } catch(ex) {
                 // in case `then` or a `finally` handler throws an error
                 // > pass it down to a first `catch` handler
@@ -73,9 +73,6 @@ class JestMockPromise {
                 this.rejectFn(ex);
             }
         };
-
-        // call all the `finally` which follow
-        this.callFinally();
     }
 
     /**
@@ -93,17 +90,24 @@ class JestMockPromise {
                 returnedValue:any;
 
             if(el.catch) {
-                returnedValue = el.catch(err);
-                // try executing `then`/`finally` handlers which follow
-                this.handlerIx++;
-                this.resolveFn(returnedValue);
-                // stop the execution as soon as you run into a first catch element
-                break;
+                try {
+                    returnedValue = el.catch(err);
+                    // try executing `then`/`finally` handlers which follow
+                    this.handlerIx++;
+                    this.resolveFn(returnedValue);
+                    // stop the execution as soon as you run into a first catch element
+                    break;
+                } catch(ex) {
+                    // in an error was thrown within `catch` block
+                    // > pass it down to closest `catch` handler
+                    this.handlerIx++
+                    this.rejectFn(ex);
+                    break; // the execution will continue from `rejectFn`
+                }
+            } else if(el.finally) {
+                this.callFinally();
             }
         };
-
-        // call all the `finally` which follow
-        this.callFinally();
     }
 
     /**
@@ -126,11 +130,11 @@ class JestMockPromise {
                     callNextThen = true; // if `then` is next - call it
                 } else if(el.then && callNextThen) {
                     // if you run into `then` right after finally > let the dedicated handler process it
-                    this.resolveFn(void 0);
+                    this.resolveFn();
                     break; // the execution will continue from `resolveFn`
                 } else if(el.catch) {
                     callNextThen = false;
-                    continue; // skipping `catch`
+                    continue; // skipping `catch` and search for the next `finally`
                 }
             } catch(ex) {
                 // in case `then` or a `finally` handler throws an error
