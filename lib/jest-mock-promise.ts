@@ -154,6 +154,14 @@ class JestMockPromise {
      * @param onRejected rejection handler function
      */
     public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise {
+        if (typeof onFulfilled !== 'function') {
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+            // "onFulfilled: A Function called if the Promise is fulfilled.
+            // This function has one argument, the fulfillment value.
+            // If it is not a function, it is internally replaced with an
+            // "Identity" function (it returns the received argument)"
+            onFulfilled = x => x;
+        }
 
         // if the promise is already settled (resolved or rejected)
         // > call the apropriate handler

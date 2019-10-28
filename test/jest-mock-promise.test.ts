@@ -242,3 +242,27 @@ test('return value from `catch` should be passed to the next `then` in chain', (
     expect(thenHandler2.mock.calls.length).toEqual(1);
     expect(thenHandler2.mock.calls).toEqual([['returned by catch handler']]);
 });
+
+test('if promise is pre-resolved and `then` is called with a non-function as onFulfilled callback, onFulfilled should be replaced by identity function', () => {
+    const promise = new JestMockPromise();
+  
+    promise.resolve('mock data');
+  
+    const thenHandler = jest.fn();
+    promise.then(null).then(thenHandler);
+  
+    expect(thenHandler.mock.calls.length).toEqual(1);
+    expect(thenHandler.mock.calls).toEqual([['mock data']]);
+  });
+  
+test('if `then` is called with a non-function as onFulfilled callback, onFulfilled should be replaced by identity function', () => {
+    const promise = new JestMockPromise();
+
+    const thenHandler = jest.fn();
+    promise.then(null).then(thenHandler);
+
+    promise.resolve('mock data');
+
+    expect(thenHandler.mock.calls.length).toEqual(1);
+    expect(thenHandler.mock.calls).toEqual([['mock data']]);
+});
