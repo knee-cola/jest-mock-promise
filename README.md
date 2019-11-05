@@ -3,10 +3,10 @@ This is yet another _synchronous_ implementation od JavaScript Promise.
 
 Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
 
-## Why is it then called *jest-mock-promise*?
+### Why is it then called *jest-mock-promise*?
 Because it was originally written as a part of the [jest-mock-fetch](https://www.npmjs.com/package/jest-mock-fetch) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
 
-## Can it be used in unit testing?
+### Can it be used in unit testing?
 The answer is **Yes**! Since it's not married with Jest it can also be used with other JavaScript testing frameworks (i.e. Mocha, Jasmine).
 
 # What's in this document?
