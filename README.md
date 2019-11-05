@@ -1,5 +1,5 @@
 # What's this?
-This is yet another synchronous implementation od JavaScript Promise, written to ease the pain of unit testing. It's written in TypeScript as a support class for an [Jest Mock Axios](https://www.npmjs.com/package/jest-mock-axios).
+This is yet another synchronous implementation od JavaScript Promise, written to ease the pain of unit testing. It's written in TypeScript as a support class for an [Jest Mock Promise](https://www.npmjs.com/package/jest-mock-promise).
 
 ### Why yet another?
 Because of "code first, search later" approach to solving problems.
@@ -8,7 +8,7 @@ Because of "code first, search later" approach to solving problems.
 We have good news! The answer is Yes! In fact it can be used outside a unit-testing scenario, since it doesn't contain any unit-testing-specific features!
 
 ### Why is it then called *jest-mock-promise*?
-Because it was originally written as a part of the [jest-mock-axios](https://www.npmjs.com/package/jest-mock-axios) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
+Because it was originally written as a part of the [jest-mock-promise](https://www.npmjs.com/package/jest-mock-promise) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
 
 # What's in this document?
 
