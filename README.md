@@ -1,14 +1,13 @@
 # What's this?
-This is yet another synchronous implementation od JavaScript Promise, written to ease the pain of unit testing. It's written in TypeScript as a support class for an [Jest Mock Promise](https://www.npmjs.com/package/jest-mock-promise).
+This is yet another _synchronous_ implementation od JavaScript Promise.
 
-### Why yet another?
-Because of "code first, search later" approach to solving problems.
+Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
 
-### Can it be used with Mocha/Jasmine?
-We have good news! The answer is Yes! In fact it can be used outside a unit-testing scenario, since it doesn't contain any unit-testing-specific features!
+## Why is it then called *jest-mock-promise*?
+Because it was originally written as a part of the [jest-mock-fetch](https://www.npmjs.com/package/jest-mock-fetch) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
 
-### Why is it then called *jest-mock-promise*?
-Because it was originally written as a part of the [jest-mock-promise](https://www.npmjs.com/package/jest-mock-promise) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
+## Can it be used in unit testing?
+The answer is **Yes**! Since it's not married with Jest it can also be used with other JavaScript testing frameworks (i.e. Mocha, Jasmine).
 
 # What's in this document?
 
