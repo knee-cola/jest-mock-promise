@@ -16,7 +16,7 @@ Because it was originally written as a part of the [jest-mock-axios](https://www
 * [How to use it?](#how-to-use-it)
   * [First example - Traditional async test](#first-example---traditional-async-test)
   * [Second example - Applying the synchronous Promise](#second-example---applying-the-synchronous-promise )
-  * [Third example - Mocking Axios](#third-example---mocking-axios)
+  * [Third example - Mocking `fetch`](#third-example---mocking-fetch)
 * [API](#api)
 
 # How does it work?
@@ -161,9 +161,9 @@ describe('testing the multiply component', () => {
 ```
 As we can see, reading our code just became much easier! Hooray!
 
-## Third example - Mocking Axios
+## Third example - Mocking `fetch`
 
-As the final example we can have a look source code of [`jest-mock-axios`](https://github.com/knee-cola/jest-mock-axios), which is based on `jest-mock-promise`.
+As the final example we can have a look source code of [`jest-mock-fetch`](https://github.com/knee-cola/jest-mock-fetch), which is based on `jest-mock-promise`.
 
 # API
 
