@@ -1,6 +1,6 @@
 {
   "name": "jest-mock-promise",
-  "version": "1.1.8",
+  "version": "1.1.10",
   "description": "Synchronous Promise Mock for testing with Jest",
   "main": "dist/jest-mock-promise.js",
   "types": "dist/jest-mock-promise.d.ts",

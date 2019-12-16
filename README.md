@@ -1,16 +1,18 @@
 # What's this?
-This is yet another _synchronous_ implementation od JavaScript Promise. *JestMockPromise* implements the same API as native JavaScript Promise, which added benefit that it can be resolved *"from outside"* (see the examples listed below).
+This a _synchronous_ implementation od JavaScript Promise. *JestMockPromise* implements the same API as native JavaScript Promise, with two added benefits:
+* it works synchronously - it calls the handler functions (`then`, `catch`, `finally`) right away (examples below clarify this)
+* it exposes the `resolve` and `reject` functions as instance methods allowig the promise to be resolved outside of _executor function_
 
-Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
+Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context.
 
 # What's in this document?
 
-* [How does it work?](#how-does-it-work)
-* [How to use it?](#how-to-use-it)
+* [API](#api)
+* [JestMockPromise vs native Promise](#jestmockpromise-vs-native-promise)
+* [An unit testing example?](#an-unit-testing-example)
   * [First example - Traditional async test](#first-example---traditional-async-test)
   * [Second example - Applying the synchronous Promise](#second-example---applying-the-synchronous-promise )
   * [Third example - Mocking `fetch`](#third-example---mocking-fetch)
-* [API](#api)
 
 # TL; DR
 ### Why is it then called *jest-mock-promise*?
@@ -29,18 +31,17 @@ This methods do the same job as the ones passed to the main callback function:
 ```javascript
 new Promise((resolve, reject) => { resolve(1,2);  });
 ```
-Having them attached to the instance enables us to call them outside the callback function, which makes our code much more readable:
+Having `resolve` and `reject` attached as instance methods enables us to call them outside the callback function, which makes our code much more readable:
 ```javascript
 let promise = new Promise();
 
-promise.resolve(1,2);
+// resolving a promise
+promise.resolve(1, 2);
 ```
 
-# How does it work - Examples
+# JestMockPromise vs native Promise
 
-It works the same way a normal Promise would, with the exception that does it right away (synchronously) and not at later time (async).
-
-Let's jump right in and see how to use this:
+Let's jump right in and see an example:
 ```javascript
 import JestMockPromise from "../lib/jest-mock-promise";
 
@@ -103,7 +104,7 @@ If you compare this with the first example you can notice the following:
 1. the order of execution is different - *"3. Promise is resolved"* is logged to the console **AFTER** *"4. Last line of code"*
 2. in order to access the `resolve` function you need to store to an outside variable within the Promise callback function
 
-# How to use it?
+# An unit testing example
 
 Synchronous Promise was created to simplify unit testing an async component. So in the next two examples we'll have a look at how we can do just that - simplify a unit test.
 
