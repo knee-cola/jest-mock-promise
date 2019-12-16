@@ -1,13 +1,5 @@
 # What's this?
-This is yet another _synchronous_ implementation od JavaScript Promise.
-
-Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
-
-### Why is it then called *jest-mock-promise*?
-Because it was originally written as a part of the [jest-mock-fetch](https://www.npmjs.com/package/jest-mock-fetch) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
-
-### Can it be used in unit testing?
-The answer is **Yes**! Since it's not married with Jest it can also be used with other JavaScript testing frameworks (i.e. Mocha, Jasmine).
+This is yet another _synchronous_ implementation od JavaScript Promise. *JestMockPromise* implements the same API as native JavaScript Promise, which added benefit that it can be resolved *"from outside"* (see the examples listed below).
 
 # What's in this document?
 
@@ -18,13 +10,52 @@ The answer is **Yes**! Since it's not married with Jest it can also be used with
   * [Third example - Mocking `fetch`](#third-example---mocking-fetch)
 * [API](#api)
 
-# How does it work?
+# TL; DR
+Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
+
+### Why is it then called *jest-mock-promise*?
+Because it was originally written as a part of the [jest-mock-fetch](https://www.npmjs.com/package/jest-mock-fetch) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
+
+### Can it be used in unit testing?
+The answer is **Yes**! Since it's not married with Jest it can also be used with other JavaScript testing frameworks (i.e. Mocha, Jasmine).
+
+# How does it work - Examples
 
 It works the same way a normal Promise would, with the exception that does it right away (synchronously) and not at later time (async).
 
-Let's use the following example to see how a synchronous promise is different from a regular one:
+Let's jump right in and see how to use this:
+```javascript
+import JestMockPromise from "../lib/jest-mock-promise";
+
+const promise = new JestMockPromise((resolve, reject) => {
+    // do you business normal here as normaly
+});
+
+console.log('1. Promise is ready');
+
+promise.then(() => console.log('3. Promise is resolved');
+
+console.log('2. Will resolve the promise');
+promise.resolve(); // resolving the promise directly
+
+console.log('4. Last line of code');
+```
+
+Let's now have a look at what the console output will look:
+```
+1. Promise is ready
+2. Will resolve the promise
+3. Promise is resolved
+4. Last line of code
+```
+As you can see, the `then` handler was executed **before** the last line of code!
+
+The crutial thing here is that this promise exposes the *resolve* function as an **instance method**, which means that you can call it directly on the instance of the promise object. This becomes escpecially useful in unit testing when you need to mock a component which returns a promise (i.e. [`jest-mock-fetch`](https://github.com/knee-cola/jest-mock-fetch)).
+
+Let's now try to implement something similar using regular Promise object:
 
 ```javascript
+// here we'll store the resolve Function
 let resolveFn;
 
 // creating a new promis
@@ -35,10 +66,10 @@ let promise = new Promise((resolve, reject) => {
 });
 
 // attaching a `then` handler
-promise.then(() => console.log('2. Promise is resolved'));
+promise.then(() => console.log('3. Promise is resolved'));
 
 // resolving the promise right away
-console.log('3. Will resolve the promise');
+console.log('2. Will resolve the promise');
 resolveFn();
 
 console.log('4. Last line of code');
@@ -46,22 +77,13 @@ console.log('4. Last line of code');
 The regular promise would produce the following console output:
 ```
 1. Promise is ready
-3. Will resolve the promise
+2. Will resolve the promise
 4. Last line of code
-2. Promise is resolved
-```
-The *"2. Promise is resolved"* is logged to the console **before** *"4. Last line of code"* because regular promise runs registered hander functions (`then`, `catch`) in the next JavaScript *timeslot*, after all the code has finished executing.
+3. Promise is resolved
 
-Let's now have a look at what the console output will look like for synchronous promise:
-```
-1. Promise is ready
-3. Will resolve the promise
-2. Promise is resolved
-4. Last line of code
-```
-As you can see, the `then` handler was executed **before** the last line of code!
-
-If you've ever tried unit-testing async code, than you'll know how painfull that can be!
+If you compare this with the first example you can notice the following:
+1. the order of execution is different - *"3. Promise is resolved"* is logged to the console **AFTER** *"4. Last line of code"*
+2. in order to access the `resolve` function you need to store to an outside variable within the Promise callback function
 
 # How to use it?
 
