@@ -1,6 +1,8 @@
 # What's this?
 This is yet another _synchronous_ implementation od JavaScript Promise. *JestMockPromise* implements the same API as native JavaScript Promise, which added benefit that it can be resolved *"from outside"* (see the examples listed below).
 
+Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
+
 # What's in this document?
 
 * [How does it work?](#how-does-it-work)
@@ -11,8 +13,6 @@ This is yet another _synchronous_ implementation od JavaScript Promise. *JestMoc
 * [API](#api)
 
 # TL; DR
-Although its originally created to make writing unit tests easier, it can also be used outside the unit testing context. In fact it doesn't even contain any unit-testing-specific features and apart from it's name it has nothing to do with _Jest_.
-
 ### Why is it then called *jest-mock-promise*?
 Because it was originally written as a part of the [jest-mock-fetch](https://www.npmjs.com/package/jest-mock-fetch) project and still is it's integral part (as an external dependency). So it's name is a legacy of it's humble beginnings :)
 
