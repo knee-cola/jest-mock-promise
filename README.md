@@ -80,6 +80,7 @@ The regular promise would produce the following console output:
 2. Will resolve the promise
 4. Last line of code
 3. Promise is resolved
+```
 
 If you compare this with the first example you can notice the following:
 1. the order of execution is different - *"3. Promise is resolved"* is logged to the console **AFTER** *"4. Last line of code"*
