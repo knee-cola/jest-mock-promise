@@ -19,6 +19,23 @@ Because it was originally written as a part of the [jest-mock-fetch](https://www
 ### Can it be used in unit testing?
 The answer is **Yes**! Since it's not married with Jest it can also be used with other JavaScript testing frameworks (i.e. Mocha, Jasmine).
 
+# API
+
+The API of this synchronous promise matches the one of the regular Promise, with two additional instance methods (attached to an instance of the Promise):
+* `resolve` - resolves a promise instance
+* `reject` - rejects a promise instance
+
+This methods do the same job as the ones passed to the main callback function:
+```javascript
+new Promise((resolve, reject) => { resolve(1,2);  });
+```
+Having them attached to the instance enables us to call them outside the callback function, which makes our code much more readable:
+```javascript
+let promise = new Promise();
+
+promise.resolve(1,2);
+```
+
 # How does it work - Examples
 
 It works the same way a normal Promise would, with the exception that does it right away (synchronously) and not at later time (async).
@@ -186,23 +203,6 @@ As we can see, reading our code just became much easier! Hooray!
 ## Third example - Mocking `fetch`
 
 As the final example we can have a look source code of [`jest-mock-fetch`](https://github.com/knee-cola/jest-mock-fetch), which is based on `jest-mock-promise`.
-
-# API
-
-The API of this synchronous promise matches the one of the regular Promise, with two additional instance methods (attached to an instance of the Promise):
-* `resolve` - resolves a promise instance
-* `reject` - rejects a promise instance
-
-This methods do the same job as the ones passed to the main callback function:
-```javascript
-new Promise((resolve, reject) => { resolve(1,2);  });
-```
-Having them attached to the instance enables us to call them outside the callback function, which makes our code much more readable:
-```javascript
-let promise = new Promise();
-
-promise.resolve(1,2);
-```
 
 # License
 MIT License, http://www.opensource.org/licenses/MIT
