@@ -48,7 +48,7 @@ declare class JestMockPromise<T = any> {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    then(onFulfilled: AnyFunction<any, T>, onRejected?: AnyFunction): JestMockPromise<T>;
+    then(onFulfilled: AnyFunction<any, T>, onRejected?: AnyFunction): JestMockPromise<T> | any;
     /**
      * Appends a rejection handler callback to the promise,
      * and returns a new promise resolving to the return
