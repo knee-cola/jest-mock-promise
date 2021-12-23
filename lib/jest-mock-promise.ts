@@ -47,12 +47,13 @@ class JestMockPromise<T = any> {
     private resolveFn(value?:T):void {
 
         this.data = value;
+        let nextValue:any = value;
 
         this.state = PromiseState.resolved;
         this.err = void 0;
 
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType<T> = this.handlers[this.handlerIx];
+            var el:HandlerType<any> = this.handlers[this.handlerIx];
 
             // stop the execution at first `catch` handler you run into
             if(el.catch || el.finally) {
@@ -61,8 +62,8 @@ class JestMockPromise<T = any> {
             }
 
             try {
-                // calling a `then` handler
-                value = el.then(value);
+                // calling a `then` handler with the value returned by the previous handler
+                nextValue = el.then(nextValue);
             } catch(ex) {
                 // in case `then` or a `finally` handler throws an error
                 // > pass it down to a first `catch` handler
@@ -152,7 +153,7 @@ class JestMockPromise<T = any> {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    public then(onFulfilled:AnyFunction<any, T>, onRejected?:AnyFunction):JestMockPromise<T> {
+    public then(onFulfilled:AnyFunction<any, T>, onRejected?:AnyFunction):JestMockPromise<T> | any {
         if (typeof onFulfilled !== 'function') {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
             // "onFulfilled: A Function called if the Promise is fulfilled.
@@ -171,8 +172,14 @@ class JestMockPromise<T = any> {
                 }
                 break;
             case PromiseState.resolved:
-                onFulfilled(this.data);
-                break;
+                {
+                    // in order to allow chaining we need to return
+                    // a new Promise resolved with the value returned
+                    // by `onFulfilled`
+                    const newPromise = new JestMockPromise();
+                    newPromise.resolve( onFulfilled(this.data) );
+                    return(newPromise);
+                }
             default:
                 this.handlers.push({ then: onFulfilled });
 

@@ -266,3 +266,52 @@ test('if `then` is called with a non-function as onFulfilled callback, onFulfill
     expect(thenHandler.mock.calls.length).toEqual(1);
     expect(thenHandler.mock.calls).toEqual([['mock data']]);
 });
+
+test('in case of multiple `then` handlers each must be called with the value returned by the previous one', () => {
+    const promise = new JestMockPromise<string>();
+
+    const firstHandler = jest.fn<any,[string]>().mockReturnValue("1st return value");
+    const secondHandler = jest.fn().mockReturnValue("2nd return value");
+    const thirdHandler = jest.fn();
+
+    promise
+        .then(firstHandler)
+        .then(secondHandler)
+        .then(thirdHandler);
+
+    promise.resolve('mock data');
+
+    expect(firstHandler.mock.calls.length).toEqual(1);
+    expect(firstHandler.mock.calls).toEqual([['mock data']]);
+
+    expect(secondHandler.mock.calls.length).toEqual(1);
+    expect(secondHandler.mock.calls).toEqual([['1st return value']]);
+
+    expect(thirdHandler.mock.calls.length).toEqual(1);
+    expect(thirdHandler.mock.calls).toEqual([['2nd return value']]);
+});
+
+test('if promise is pre-resolved and and there are multiple `then` handlers each must be called with the value returned by the previous one', () => {
+    const promise = new JestMockPromise<string>();
+
+    const firstHandler = jest.fn<any,[string]>().mockReturnValue("1st return value");
+    const secondHandler = jest.fn().mockReturnValue("2nd return value");
+    const thirdHandler = jest.fn();
+
+    promise.resolve('mock data');
+
+    promise
+        .then(firstHandler)
+        .then(secondHandler)
+        .then(thirdHandler);
+
+
+    expect(firstHandler.mock.calls.length).toEqual(1);
+    expect(firstHandler.mock.calls).toEqual([['mock data']]);
+
+    expect(secondHandler.mock.calls.length).toEqual(1);
+    expect(secondHandler.mock.calls).toEqual([['1st return value']]);
+
+    expect(thirdHandler.mock.calls.length).toEqual(1);
+    expect(thirdHandler.mock.calls).toEqual([['2nd return value']]);
+});
