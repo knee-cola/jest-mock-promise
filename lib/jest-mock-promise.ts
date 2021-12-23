@@ -22,7 +22,7 @@ import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-type
 
 class JestMockPromise<T = any> {
 
-    private handlers:Array<HandlerType>;
+    private handlers:Array<HandlerType<T>>;
     private handlerIx:number;
     private data:T;
     private err:any;
@@ -52,7 +52,7 @@ class JestMockPromise<T = any> {
         this.err = void 0;
 
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType = this.handlers[this.handlerIx];
+            var el:HandlerType<T> = this.handlers[this.handlerIx];
 
             // stop the execution at first `catch` handler you run into
             if(el.catch || el.finally) {
@@ -83,7 +83,7 @@ class JestMockPromise<T = any> {
 
         // find the first `catch` handler and call it
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType = this.handlers[this.handlerIx],
+            var el:HandlerType<T> = this.handlers[this.handlerIx],
                 returnedValue:any;
 
             if(el.catch) {
@@ -118,7 +118,7 @@ class JestMockPromise<T = any> {
         // find the first `finally` and call it
         for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
 
-            let el:HandlerType = this.handlers[this.handlerIx];
+            let el:HandlerType<T> = this.handlers[this.handlerIx];
             
             try {
                 if(el.finally) {
@@ -152,7 +152,7 @@ class JestMockPromise<T = any> {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise<T> {
+    public then(onFulfilled:AnyFunction<any, T>, onRejected?:AnyFunction):JestMockPromise<T> {
         if (typeof onFulfilled !== 'function') {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
             // "onFulfilled: A Function called if the Promise is fulfilled.
