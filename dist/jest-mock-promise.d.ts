@@ -10,7 +10,7 @@
  *
  * By using these methods, we can write something like (provided that the Promise is mocked):
  *
- *    let promise = ExternalComponent.doAyncWork();
+ *    let promise = ExternalComponent.doAsyncWork();
  *    promise.resolve({ label: 'this is some mock data' });
  *
  * @author   knee-cola<nikola.derezic@gmail.com>
@@ -18,7 +18,7 @@
  *
  */
 import { AnyFunction } from './jest-mock-promise-types';
-declare class JestMockPromise {
+declare class JestMockPromise<T = any> {
     private handlers;
     private handlerIx;
     private data;
@@ -48,7 +48,7 @@ declare class JestMockPromise {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    then(onFulfilled: AnyFunction, onRejected?: AnyFunction): JestMockPromise;
+    then(onFulfilled: AnyFunction<any, T>, onRejected?: AnyFunction): JestMockPromise<T>;
     /**
      * Appends a rejection handler callback to the promise,
      * and returns a new promise resolving to the return
@@ -70,7 +70,7 @@ declare class JestMockPromise {
      * handlers have been registered.
      * @param {*} data
      */
-    resolve(data?: any): void;
+    resolve(data?: T): void;
     /**
      * Rejects the promise with the given promise with the given error object.
      * This is a non-standard method, which should be the last
@@ -83,11 +83,11 @@ declare class JestMockPromise {
      * Creates a resolved promise with the given data
      * @param data data which should be passed to `then` handler functions
      */
-    static resolve(data?: any): JestMockPromise;
+    static resolve<T = any>(data?: any): JestMockPromise<T>;
     /**
      * Creates a rejected promise with the given data
      * @param err error object which is to be passed as a param to `catch` function
      */
-    static reject(err?: any): JestMockPromise;
+    static reject<T = any>(err?: any): JestMockPromise<T>;
 }
 export default JestMockPromise;
