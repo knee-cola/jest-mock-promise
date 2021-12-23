@@ -11,12 +11,12 @@
   "author": "knee-cola <nikola.derezic@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^24.0.20",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.1.0",
-    "ts-loader": "^3.1.1",
-    "typescript": "^2.9.2",
-    "webpack": "^3.12.0"
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "webpack": "^5.65.0"
   },
   "repository": {
     "type": "git",
