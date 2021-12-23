@@ -7,6 +7,7 @@ module.exports = {
     entry: {
         "jest-mock-promise": `${srcDir}/jest-mock-promise.ts`,
     },
+    mode: "production",
     output: {
         path: path.resolve(`${__dirname}/${destDir}`),
         filename: '[name].js',
