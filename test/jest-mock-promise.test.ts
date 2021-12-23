@@ -1,19 +1,19 @@
 import JestMockPromise from "../lib/jest-mock-promise";
 
 test('`finally` must be called with no arguments after if a promise is resolved', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<[number, number]>();
 
     const finallyHandler = jest.fn();
-    const thenHandler = jest.fn();
+    const thenHandler = jest.fn<void, [[number, number]]>();
 
     promise.then(thenHandler);
     promise.catch(() => {});
     promise.finally(finallyHandler);
 
-    promise.resolve('some data');
+    promise.resolve([1, 2]);
 
     expect(thenHandler.mock.calls.length).toEqual(1);
-    expect(thenHandler.mock.calls).toEqual([["some data"]]);
+    expect(thenHandler.mock.calls).toEqual([[[1, 2]]]);
 
     expect(finallyHandler.mock.calls.length).toEqual(1);
     expect(finallyHandler.mock.calls).toEqual([[]]);
@@ -38,7 +38,7 @@ test('`finally` must be called after if a promise is rejected', () => {
 });
 
 test('if promise is RESOLVED `then` directly following after `finally` should also be called', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
 
     const finallyHandler = jest.fn();
     const thenHandler = jest.fn();
@@ -121,7 +121,7 @@ test('if an error is thrown inside `finally` all the `finally` which follow shou
 });
 
 test('if an error is thrown inside `this` the closest `catch` should be called', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
 
     const thenHandler = jest.fn();
     const catchHandler = jest.fn();
@@ -144,7 +144,7 @@ test('if an error is thrown inside `this` the closest `catch` should be called',
     expect(catchHandler.mock.calls).toEqual([[mockError]]);
 });
 test('if an error is thrown inside `this` the closest `catch` should be called', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
 
     const catchHandler = jest.fn();
     const mockError = new Error('mock error');
@@ -216,7 +216,7 @@ test('if promise is pre-rejected `catch` and `finally` must be called as soon as
 });
 
 test('return value from one `then` should be passed to the next one in chain', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
     
     const thenHandler2 = jest.fn();
 
@@ -244,7 +244,7 @@ test('return value from `catch` should be passed to the next `then` in chain', (
 });
 
 test('if promise is pre-resolved and `then` is called with a non-function as onFulfilled callback, onFulfilled should be replaced by identity function', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
   
     promise.resolve('mock data');
   
@@ -256,7 +256,7 @@ test('if promise is pre-resolved and `then` is called with a non-function as onF
   });
   
 test('if `then` is called with a non-function as onFulfilled callback, onFulfilled should be replaced by identity function', () => {
-    const promise = new JestMockPromise();
+    const promise = new JestMockPromise<string>();
 
     const thenHandler = jest.fn();
     promise.then(null).then(thenHandler);

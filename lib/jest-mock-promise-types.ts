@@ -4,10 +4,10 @@ enum PromiseState {
     rejected
  }
 
- type AnyFunction = (...args: any[])=>any;
+ type AnyFunction<T=any, Y=any> = (...args: Y[])=>T;
 
- type HandlerType = {
-     then?:AnyFunction,
+ type HandlerType<T> = {
+     then?:AnyFunction<T>,
      catch?:AnyFunction,
      finally?:AnyFunction,
  };

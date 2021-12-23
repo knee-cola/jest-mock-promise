@@ -29,14 +29,14 @@ The API of this synchronous promise matches the one of the regular Promise, with
 
 This methods do the same job as the ones passed to the main callback function:
 ```javascript
-new Promise((resolve, reject) => { resolve(1,2);  });
+new Promise<string>((resolve, reject) => { resolve("some string value");  });
 ```
 Having `resolve` and `reject` attached as instance methods enables us to call them outside the callback function, which makes our code much more readable:
 ```javascript
-let promise = new Promise();
+let promise = new Promise<string>();
 
 // resolving a promise
-promise.resolve(1, 2);
+promise.resolve("some string value");
 ```
 
 # JestMockPromise vs native Promise
@@ -76,7 +76,7 @@ Let's now try to implement something similar using regular Promise object:
 // here we'll store the resolve Function
 let resolveFn;
 
-// creating a new promis
+// creating a new promise
 let promise = new Promise((resolve, reject) => {
     // assigning the resolve function a variable from outter scope
     resolveFn = resolve;
@@ -118,7 +118,7 @@ The following snippet shows implementation of that component:
 import Promise from 'es6-promise';
 
 const onPromiseMultiply = (promise, callback) => {
-    promise.then((a,b) => {
+    promise.then(([a,b]) => {
         callback(a*b);
     })
 };
@@ -133,7 +133,7 @@ Now let's write some Jest tests.
 In our first example we'll create a test in a traditional async way ... just to show how terible it is. Then, in the second example, we'll improve on the original idea by introducing `jest-mock-promise`.
 
 The next snippet contains a test written in traditional async way:
-```javascript
+```typescript
 // ./src/__test__/component.spec.js
 import {onPromiseMultiply} from '../component.js';
 
@@ -142,18 +142,18 @@ describe('testing the multiply component', () => {
     it('should multiply two numbers and provide the result to the callback function', () => {
 
         let callbackFn = jest.fn();
-        let promise = new Promise((resolve, reject) {
+        let promise = new Promise<[number,number]>((resolve, reject) {
             // providing two numbers which need to be multiplied
             // as we know, although we have resolved the promise right away,
             // `then` handlers will be called asnyc at later time
-            resolve(1,2);
+            resolve([1,2]);
         });
 
         // calling the function we want to test
         onPromiseMultiply(promise, callbackFn);
 
         // Altought promise is already resolved, `then` handlers will
-        // be called asnyc at later time. That's why we need to put
+        // be called async at later time. That's why we need to put
         // our expectation inside a `then` handler
         // + we need to return a promise to the Jest, so it knows
         // we're doing some async testing
@@ -186,13 +186,13 @@ describe('testing the multiply component', () => {
     it('should multiply two numbers and provide the result to the callback function', () => {
 
         let callbackFn = jest.fn();
-        let promise = new Promise();
+        let promise = new Promise<[number,number]>();
 
         // calling the function we want to test
         onPromiseMultiply(promise, callbackFn);
 
         // resolving our promise
-        promise.resolve(1,2);
+        promise.resolve([1,2]);
 
         // testing to see if our function is working correctly
         expect(callbackFn).toHaveBeenCalledWith(3);
