@@ -1,19 +1,19 @@
 import JestMockPromise from "../lib/jest-mock-promise";
 
 test('`finally` must be called with no arguments after if a promise is resolved', () => {
-    const promise = new JestMockPromise<string>();
+    const promise = new JestMockPromise<[number, number]>();
 
     const finallyHandler = jest.fn();
-    const thenHandler = jest.fn<void, [string]>();
+    const thenHandler = jest.fn<void, [[number, number]]>();
 
     promise.then(thenHandler);
     promise.catch(() => {});
     promise.finally(finallyHandler);
 
-    promise.resolve('some data');
+    promise.resolve([1, 2]);
 
     expect(thenHandler.mock.calls.length).toEqual(1);
-    expect(thenHandler.mock.calls).toEqual([["some data"]]);
+    expect(thenHandler.mock.calls).toEqual([[[1, 2]]]);
 
     expect(finallyHandler.mock.calls.length).toEqual(1);
     expect(finallyHandler.mock.calls).toEqual([[]]);
