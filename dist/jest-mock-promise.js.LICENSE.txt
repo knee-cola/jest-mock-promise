@@ -1,0 +1,19 @@
+/**
+ * Synchronous Promise, which gets settled (resolved or settled) in a synchronous manner.
+ *
+ * `JestMockPromise` was written to simplify unit testing mocking (i.e. in [Jest](https://facebook.github.io/jest/) )
+ *
+ * In order to simplify synchronious promise settling two additional methods
+ * were added to the promise instance:
+ *   - `resolve` = forces the given promise to be resolved right away
+ *   - `reject` = forces the given promise to be rejected right away
+ *
+ * By using these methods, we can write something like (provided that the Promise is mocked):
+ *
+ *    let promise = ExternalComponent.doAsyncWork();
+ *    promise.resolve({ label: 'this is some mock data' });
+ *
+ * @author   knee-cola<nikola.derezic@gmail.com>
+ * @license  @license MIT License, http://www.opensource.org/licenses/MIT
+ *
+ */
