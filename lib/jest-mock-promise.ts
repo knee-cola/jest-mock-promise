@@ -10,7 +10,7 @@
  * 
  * By using these methods, we can write something like (provided that the Promise is mocked):
  * 
- *    let promise = ExternalComponent.doAyncWork();
+ *    let promise = ExternalComponent.doAsyncWork();
  *    promise.resolve({ label: 'this is some mock data' });
  * 
  * @author   knee-cola<nikola.derezic@gmail.com>
@@ -19,13 +19,12 @@
  */
 
 import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
-import { returnStatement } from '@babel/types';
 
-class JestMockPromise {
+class JestMockPromise<T = any> {
 
     private handlers:Array<HandlerType>;
     private handlerIx:number;
-    private data:any;
+    private data:T;
     private err:any;
     private state:PromiseState;
 
@@ -45,7 +44,7 @@ class JestMockPromise {
      * Resolves the given promise
      * @param value data which should be passed to `then` handler functions
      */
-    private resolveFn(value?:any):void {
+    private resolveFn(value?:T):void {
 
         this.data = value;
 
@@ -153,7 +152,7 @@ class JestMockPromise {
      * @param onFulfilled fulfillment handler function
      * @param onRejected rejection handler function
      */
-    public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise {
+    public then(onFulfilled:AnyFunction, onRejected?:AnyFunction):JestMockPromise<T> {
         if (typeof onFulfilled !== 'function') {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
             // "onFulfilled: A Function called if the Promise is fulfilled.
@@ -228,7 +227,7 @@ class JestMockPromise {
      * handlers have been registered.
      * @param {*} data 
      */
-    public resolve(data?:any) {
+    public resolve(data?:T) {
         this.resolveFn(data);
     }
 
@@ -247,9 +246,9 @@ class JestMockPromise {
      * Creates a resolved promise with the given data
      * @param data data which should be passed to `then` handler functions
      */
-    static resolve(data?:any):JestMockPromise {
+    static resolve<T=any>(data?:any):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.resolve` will be executed async ... for sync execution call `resolve` method on an instance of `Promise`');
-        return(new JestMockPromise((resolve, reject) => {
+        return(new JestMockPromise<T>((resolve, reject) => {
             setTimeout(resolve(data), 0);
         }));
     }
@@ -258,9 +257,9 @@ class JestMockPromise {
      * Creates a rejected promise with the given data
      * @param err error object which is to be passed as a param to `catch` function
      */
-    static reject(err?:any):JestMockPromise {
+    static reject<T=any>(err?:any):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.reject` will be executed async ... for sync execution call `reject` method on an instance of `Promise`');
-        return(new JestMockPromise((resolve, reject) => {
+        return(new JestMockPromise<T>((resolve, reject) => {
             setTimeout(reject(err), 0);
         }));
     }
