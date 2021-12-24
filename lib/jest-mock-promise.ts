@@ -20,128 +20,140 @@
 
 import { PromiseState, AnyFunction, HandlerType } from './jest-mock-promise-types';
 
+type QueueItem<T> = {
+    /** handler registered with `this` */
+    onFulfilled?:AnyFunction<any, T>,
+    /** handler registered with `catch` or `this` */
+    onRejected?:AnyFunction<any, T>,
+    /** handler registered with `finally` */
+    onFinally?:AnyFunction<any, T>,
+    /** chained promise */
+    nextPromise:JestMockPromise,
+    /** value returned by `onFulfilled` */
+    nextValue?:T,
+    /** value set by `reject` method */
+    err?:any
+};
+
+type Queue<T> = Array<QueueItem<T>>;
+
+type ResolveLevelItem = {
+    instance: JestMockPromise,
+    value?:any,
+    err?:any,
+    newState: PromiseState
+};
+
+type ResolveLevel = ResolveLevelItem[];
+
 class JestMockPromise<T = any> {
 
-    private handlers:Array<HandlerType<T>>;
-    private handlerIx:number;
-    private data:T;
+    protected queue:Queue<T>;
+
+    /** value with wich the promise was resolved */
+    private value:T;
+    /** error with wich the promise was rejected */
     private err:any;
-    private state:PromiseState;
+    /** current state of the promise */
+    protected state:PromiseState;
 
     constructor(callbackFn?:(x?:any,y?:any)=>any) {
 
-        this.handlers = [];
-        this.handlerIx = 0;
+        this.queue = [];
         this.state = PromiseState.pending;
 
         // if given, calling the given function
         if(callbackFn) {
-            callbackFn(this.resolveFn.bind(this), this.rejectFn.bind(this));
+            callbackFn(this.resolve.bind(this), this.reject.bind(this));
         }
     }
 
     /**
-     * Resolves the given promise
-     * @param value data which should be passed to `then` handler functions
+     * Resolves promises at a given level
+     * @param currLevel list of promises which need to be resolved at this level
      */
-    private resolveFn(value?:T):void {
+    private static processLevel(currLevel:ResolveLevel):void {
 
-        this.data = value;
-        let nextValue:any = value;
+        if(currLevel.length === 0) return;
 
-        this.state = PromiseState.resolved;
-        this.err = void 0;
+        let nextLevel:ResolveLevel = [];
 
-        for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType<any> = this.handlers[this.handlerIx];
+        currLevel.forEach(({instance, value, err, newState}) => {
+            let { queue } = instance;
 
-            // stop the execution at first `catch` handler you run into
-            if(el.catch || el.finally) {
-                this.callFinally();
-                return;
-            }
+            instance.state = newState;
+            instance.value = value;
+            instance.err = err;
 
-            try {
-                // calling a `then` handler with the value returned by the previous handler
-                nextValue = el.then(nextValue);
-            } catch(ex) {
-                // in case `then` or a `finally` handler throws an error
-                // > pass it down to a first `catch` handler
-                this.handlerIx++;
-                this.rejectFn(ex);
-            }
-        };
-    }
+            queue.forEach(({ nextPromise, onFulfilled, onRejected, onFinally }, ix) => {
 
-    /**
-     * Rejects the given promise
-     * @param err error object which is to be passed as a param to `catch` function
-     */
-    private rejectFn(err:any):void {
-        
-        this.state = PromiseState.rejected;
-        this.err = err;
+                // by default pass the original value and state to the next level
+                let nextLevelItem:ResolveLevelItem = {
+                    instance: nextPromise,
+                    value,
+                    err,
+                    newState 
+                };
 
-        // find the first `catch` handler and call it
-        for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-            var el:HandlerType<T> = this.handlers[this.handlerIx],
-                returnedValue:any;
+                switch(newState) {
+                    case PromiseState.resolved:
+                        if(onFulfilled) {
+                            try {
+                                nextLevelItem.value = onFulfilled(value); // call the handler
+                            } catch(err:any) {
+                                // reject the next promise
+                                nextLevelItem = {
+                                    instance: nextPromise,
+                                    err,
+                                    newState: PromiseState.rejected
+                                };
+                            }
+                        }
+                        break;
+                    case PromiseState.rejected:
+                        if(onRejected) {
+                            try {
+                                // reject returns no value
+                                onRejected(err);
+                                // after the error is caught - the promise is RESOLVED
+                                nextLevelItem.newState = PromiseState.resolved;
+                            } catch(err:any) {
+                                // attach new error the the next level
+                                // - we do not need to change the state -> it remains rejected
+                                nextLevelItem.err = err;
+                            }
 
-            if(el.catch) {
-                try {
-                    returnedValue = el.catch(err);
-                    // try executing `then`/`finally` handlers which follow
-                    this.handlerIx++;
-                    this.resolveFn(returnedValue);
-                    // stop the execution as soon as you run into a first catch element
-                    break;
-                } catch(ex) {
-                    // in an error was thrown within `catch` block
-                    // > pass it down to closest `catch` handler
-                    this.handlerIx++
-                    this.rejectFn(ex);
-                    break; // the execution will continue from `rejectFn`
+                        } else {
+                            // IF the catch is handled
+                            // > throw the error!
+                            setTimeout(() => {
+                                throw new Error(`Uncaught (in promise) Error: ${err}`)
+                            });
+                        }
+                        break;
                 }
-            } else if(el.finally) {
-                this.callFinally();
-            }
-        };
-    }
-
-    /**
-     * Calls `finally` handlers
-     */
-    private callFinally():void {
-
-        /** is set to `true` after a successful `finally` call */
-        let callNextThen = false;
-
-        // find the first `finally` and call it
-        for(var maxIx=this.handlers.length; this.handlerIx<maxIx; this.handlerIx++) {
-
-            let el:HandlerType<T> = this.handlers[this.handlerIx];
-            
-            try {
-                if(el.finally) {
-                    // calling a `finally` handler
-                    el.finally(); // finally doesn't receive any data
-                    callNextThen = true; // if `then` is next - call it
-                } else if(el.then && callNextThen) {
-                    // if you run into `then` right after finally > let the dedicated handler process it
-                    this.resolveFn();
-                    break; // the execution will continue from `resolveFn`
-                } else if(el.catch) {
-                    callNextThen = false;
-                    continue; // skipping `catch` and search for the next `finally`
+                        
+                // IF handler is registered
+                if(onFinally) {
+                    try {
+                        // finally accepts no params and returns nothing
+                        onFinally();
+                    } catch(err:any) {
+                        // reject the next promise
+                        nextLevelItem = {
+                            instance: nextPromise,
+                            err,
+                            newState: PromiseState.rejected
+                        };
+                    }
                 }
-            } catch(ex) {
-                // in case `then` or a `finally` handler throws an error
-                // > pass it down to a first `catch` handler
-                this.handlerIx++;
-                this.rejectFn(ex);
-                break; // the execution will continue from `rejectFn`
-            }
-        }
+
+                nextLevel.push(nextLevelItem);
+            });
+        });
+
+        // resolve the next level promises (recursive call)
+        JestMockPromise.processLevel(nextLevel);
     }
 
     /**
@@ -163,6 +175,8 @@ class JestMockPromise<T = any> {
             onFulfilled = x => x;
         }
 
+        let nextPromise:JestMockPromise;
+
         // if the promise is already settled (resolved or rejected)
         // > call the apropriate handler
         switch(this.state) {
@@ -170,25 +184,27 @@ class JestMockPromise<T = any> {
                 if(onRejected) {
                     onRejected(this.err);
                 }
+
+                nextPromise = new JestMockPromise()
+                nextPromise.reject(this.err);
                 break;
             case PromiseState.resolved:
-                {
-                    // in order to allow chaining we need to return
-                    // a new Promise resolved with the value returned
-                    // by `onFulfilled`
-                    const newPromise = new JestMockPromise();
-                    newPromise.resolve( onFulfilled(this.data) );
-                    return(newPromise);
-                }
+                nextPromise = new JestMockPromise();
+                // ToDo: što ako `onFulfilled` baci grešku???
+                nextPromise.resolve( onFulfilled(this.value) );
+                break;
             default:
-                this.handlers.push({ then: onFulfilled });
-
-                if(onRejected) {
-                    this.handlers.push({ catch: onRejected });
-                }
+                nextPromise = new JestMockPromise();
         }
 
-        return(this);
+        this.queue.push({
+            onFulfilled,
+            onRejected,
+            nextPromise
+        });
+
+        // in order to allow chaining we need to return the new Promise
+        return(nextPromise);
     }
 
     /**
@@ -200,15 +216,26 @@ class JestMockPromise<T = any> {
      * @param onRejected rejection handler function
      */
     public catch(onRejected:AnyFunction) {
+
+        let nextPromise:JestMockPromise;
+
         // if the promise is already rejected
         // > call the handler right away
         if(this.state === PromiseState.rejected) {
+            // ToDo: što ako `onRejected` baci grešku???
             onRejected(this.err);
+            nextPromise = new JestMockPromise();
+            nextPromise.resolve(); // after a the error is caught the next promise is resolved
         } else {
-            this.handlers.push({ catch: onRejected });
+            nextPromise = new JestMockPromise();
         }
 
-        return(this);
+        this.queue.push({
+            onRejected,
+            nextPromise
+        });
+
+        return(nextPromise);
     }
 
     /**
@@ -216,15 +243,25 @@ class JestMockPromise<T = any> {
      * @param onFinally finally handler function
      */
     public finally(onFinally:AnyFunction) {
+        let nextPromise:JestMockPromise;
+
         // if the promise is already resolved or rejected
         // > call the handler right away
         if(this.state !== PromiseState.pending) {
+            // ToDo: što ako `onFinally` baci grešku???
             onFinally();
+            nextPromise = new JestMockPromise();
+            nextPromise.resolve(this.value);
         } else {
-            this.handlers.push({ finally: onFinally });
+            nextPromise = new JestMockPromise();
         }
 
-        return(this);
+        this.queue.push({
+            onFinally,
+            nextPromise
+        });
+
+        return(nextPromise);
     }
 
     /**
@@ -232,10 +269,10 @@ class JestMockPromise<T = any> {
      * This is a non-standard method, which should be the last
      * one to be called, after all the fulfillment and rejection
      * handlers have been registered.
-     * @param {*} data 
+     * @param {*} value 
      */
-    public resolve(data?:T) {
-        this.resolveFn(data);
+    public resolve(value?:T) {
+        JestMockPromise.processLevel([{ instance: this, value, newState: PromiseState.resolved }]);
     }
 
     /**
@@ -246,7 +283,7 @@ class JestMockPromise<T = any> {
      * @param {*} data 
      */
     public reject(err?:any) {
-        this.rejectFn(err);
+        JestMockPromise.processLevel([{ instance: this, err, newState: PromiseState.rejected }]);
     }
 
     /**
@@ -256,7 +293,7 @@ class JestMockPromise<T = any> {
     static resolve<T=any>(data?:any):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.resolve` will be executed async ... for sync execution call `resolve` method on an instance of `Promise`');
         return(new JestMockPromise<T>((resolve, reject) => {
-            setTimeout(resolve(data), 0);
+            setTimeout(() => resolve(data), 0);
         }));
     }
 
@@ -267,7 +304,7 @@ class JestMockPromise<T = any> {
     static reject<T=any>(err?:any):JestMockPromise<T> {
         console.warn('a promise created via `JestMockPromise.reject` will be executed async ... for sync execution call `reject` method on an instance of `Promise`');
         return(new JestMockPromise<T>((resolve, reject) => {
-            setTimeout(reject(err), 0);
+            setTimeout(() => reject(err), 0);
         }));
     }
 }
