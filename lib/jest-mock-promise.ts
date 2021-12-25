@@ -127,7 +127,9 @@ class JestMockPromise<T = any> {
                             // IF the catch is handled
                             // > throw the error!
                             setTimeout(() => {
-                                throw new Error(`Uncaught (in promise) Error: ${err}`)
+                                console.error(`Uncaught (in promise) Error: ${err}`);
+                                // not throwing an exception in order not to brake unit tests
+                                // throw new Error(`Uncaught (in promise) Error: ${err}`)
                             });
                         }
                         break;
@@ -291,9 +293,8 @@ class JestMockPromise<T = any> {
      * @param data data which should be passed to `then` handler functions
      */
     static resolve<T=any>(data?:any):JestMockPromise<T> {
-        console.warn('a promise created via `JestMockPromise.resolve` will be executed async ... for sync execution call `resolve` method on an instance of `Promise`');
         return(new JestMockPromise<T>((resolve, reject) => {
-            setTimeout(() => resolve(data), 0);
+            setTimeout(() => resolve(data), 100);
         }));
     }
 
@@ -302,7 +303,6 @@ class JestMockPromise<T = any> {
      * @param err error object which is to be passed as a param to `catch` function
      */
     static reject<T=any>(err?:any):JestMockPromise<T> {
-        console.warn('a promise created via `JestMockPromise.reject` will be executed async ... for sync execution call `reject` method on an instance of `Promise`');
         return(new JestMockPromise<T>((resolve, reject) => {
             setTimeout(() => reject(err), 0);
         }));

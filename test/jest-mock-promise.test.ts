@@ -1,5 +1,31 @@
 import JestMockPromise from "../lib/jest-mock-promise";
 
+test('it should support pre-resolved promise', async () => {
+    const handler = jest.fn()
+
+    const promise = JestMockPromise
+        .resolve("abcd")
+        .then(handler);
+
+    await promise;
+    
+    expect(handler.mock.calls.length).toEqual(1);
+    expect(handler).toHaveBeenCalledWith("abcd");
+});
+
+test('it should support pre-rejected promise', async () => {
+    const handler = jest.fn()
+
+    const promise = JestMockPromise
+        .reject("some error")
+        .catch(handler);
+
+    await promise;
+    
+    expect(handler.mock.calls.length).toEqual(1);
+    expect(handler).toHaveBeenCalledWith("some error");
+});
+
 test('`finally` must be called with no arguments after if a promise is resolved', () => {
 
     const finallyHandler = jest.fn();
@@ -20,7 +46,6 @@ test('`finally` must be called with no arguments after if a promise is resolved'
     expect(finallyHandler.mock.calls.length).toEqual(1);
     expect(finallyHandler.mock.calls).toEqual([[]]);
 });
-
 
 test('`finally` must be called after if a promise is rejected', () => {
     const promise = new JestMockPromise();
