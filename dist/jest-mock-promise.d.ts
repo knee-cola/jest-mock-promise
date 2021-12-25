@@ -17,28 +17,36 @@
  * @license  @license MIT License, http://www.opensource.org/licenses/MIT
  *
  */
-import { AnyFunction } from './jest-mock-promise-types';
+import { PromiseState, AnyFunction } from './jest-mock-promise-types';
+declare type QueueItem<T> = {
+    /** handler registered with `this` */
+    onFulfilled?: AnyFunction<any, T>;
+    /** handler registered with `catch` or `this` */
+    onRejected?: AnyFunction<any, T>;
+    /** handler registered with `finally` */
+    onFinally?: AnyFunction<any, T>;
+    /** chained promise */
+    nextPromise: JestMockPromise;
+    /** value returned by `onFulfilled` */
+    nextValue?: T;
+    /** value set by `reject` method */
+    err?: any;
+};
+declare type Queue<T> = Array<QueueItem<T>>;
 declare class JestMockPromise<T = any> {
-    private handlers;
-    private handlerIx;
-    private data;
+    protected queue: Queue<T>;
+    /** value with wich the promise was resolved */
+    private value;
+    /** error with wich the promise was rejected */
     private err;
-    private state;
+    /** current state of the promise */
+    protected state: PromiseState;
     constructor(callbackFn?: (x?: any, y?: any) => any);
     /**
-     * Resolves the given promise
-     * @param value data which should be passed to `then` handler functions
+     * Resolves promises at a given level
+     * @param currLevel list of promises which need to be resolved at this level
      */
-    private resolveFn;
-    /**
-     * Rejects the given promise
-     * @param err error object which is to be passed as a param to `catch` function
-     */
-    private rejectFn;
-    /**
-     * Calls `finally` handlers
-     */
-    private callFinally;
+    private static processLevel;
     /**
      * Appends fulfillment and rejection handlers to the promise,
      * and returns a new promise resolving to the return value of
@@ -57,20 +65,20 @@ declare class JestMockPromise<T = any> {
      * fulfilled.
      * @param onRejected rejection handler function
      */
-    catch(onRejected: AnyFunction): this;
+    catch(onRejected: AnyFunction): JestMockPromise<any>;
     /**
      * Appends a finally handler callback to the promise
      * @param onFinally finally handler function
      */
-    finally(onFinally: AnyFunction): this;
+    finally(onFinally: AnyFunction): JestMockPromise<any>;
     /**
      * Resolves the promise with the given promise data.
      * This is a non-standard method, which should be the last
      * one to be called, after all the fulfillment and rejection
      * handlers have been registered.
-     * @param {*} data
+     * @param {*} value
      */
-    resolve(data?: T): void;
+    resolve(value?: T): void;
     /**
      * Rejects the promise with the given promise with the given error object.
      * This is a non-standard method, which should be the last
