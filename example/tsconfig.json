@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "moduleResolution": "node",
+        "declaration": true,
+    },
+    "exclude": [
+        "node_modules",
+    ]
+}  

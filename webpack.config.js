@@ -12,7 +12,10 @@ module.exports = {
         path: path.resolve(`${__dirname}/${destDir}`),
         filename: '[name].js',
         library: 'jest-mock-promise',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
+        // in order to work on browser and node we need to set `globalObject` to `this`
+        // https://stackoverflow.com/questions/64639839/typescript-webpack-library-generates-referenceerror-self-is-not-defined
+        globalObject: 'this',
     },
 
     resolve: {

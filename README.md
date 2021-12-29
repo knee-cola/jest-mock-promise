@@ -136,6 +136,7 @@ The next snippet contains a test written in traditional async way:
 ```typescript
 // ./src/__test__/component.spec.js
 import {onPromiseMultiply} from '../component.js';
+import Promise from 'jest-mock-promise';
 
 describe('testing the multiply component', () => {
 
@@ -180,6 +181,7 @@ Now that's set up, we can modify our test:
 ```javascript
 // ./src/__test__/component.spec.js
 import {onPromiseMultiply} from '../component.js';
+import Promise from 'jest-mock-promise';
 
 describe('testing the multiply component', () => {
 
@@ -200,6 +202,8 @@ describe('testing the multiply component', () => {
 })
 ```
 As we can see, reading our code just became much easier! Hooray!
+
+A working implementation of this example can be found in the `example` directory of this project.
 
 ## Third example - Mocking `fetch`
 
