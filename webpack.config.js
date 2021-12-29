@@ -31,5 +31,8 @@ module.exports = {
                 exclude: /node_modules/
             },
         ]
-    }
+    },
+    // in order to work on browser and node we need to set `globalObject` to `this`
+    // https://stackoverflow.com/questions/64639839/typescript-webpack-library-generates-referenceerror-self-is-not-defined
+    globalObject: 'this',
 };
