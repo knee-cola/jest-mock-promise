@@ -177,26 +177,34 @@ class JestMockPromise<T = any> {
             onFulfilled = x => x;
         }
 
-        let nextPromise:JestMockPromise;
+        let nextPromise:JestMockPromise = new JestMockPromise();
 
         // if the promise is already settled (resolved or rejected)
         // > call the apropriate handler
         switch(this.state) {
             case PromiseState.rejected:
                 if(onRejected) {
-                    onRejected(this.err);
+                    try {
+                        onRejected(this.err);
+                        nextPromise.resolve(); // since the rejection is caught, the next promise is resolved
+                    } catch(ex:any) {
+                        nextPromise.reject(ex);
+                    }
+                } else {
+                    // if the rejection is not caught
+                    // > reject the next promise
+                    nextPromise.reject(this.err);
                 }
-
-                nextPromise = new JestMockPromise()
-                nextPromise.reject(this.err);
                 break;
             case PromiseState.resolved:
-                nextPromise = new JestMockPromise();
-                // ToDo: što ako `onFulfilled` baci grešku???
-                nextPromise.resolve( onFulfilled(this.value) );
+                try {
+                    nextPromise.resolve(onFulfilled(this.value) );
+                } catch(ex:any) {
+                    nextPromise.reject(ex);
+                }
                 break;
             default:
-                nextPromise = new JestMockPromise();
+                break;
         }
 
         this.queue.push({
@@ -219,17 +227,17 @@ class JestMockPromise<T = any> {
      */
     public catch(onRejected:AnyFunction) {
 
-        let nextPromise:JestMockPromise;
+        let nextPromise:JestMockPromise = new JestMockPromise();
 
         // if the promise is already rejected
         // > call the handler right away
         if(this.state === PromiseState.rejected) {
-            // ToDo: što ako `onRejected` baci grešku???
-            onRejected(this.err);
-            nextPromise = new JestMockPromise();
-            nextPromise.resolve(); // after a the error is caught the next promise is resolved
-        } else {
-            nextPromise = new JestMockPromise();
+            try {
+                onRejected(this.err);
+                nextPromise.resolve(); // after a the error is caught the next promise is resolved
+            } catch(ex:any) {
+                nextPromise.reject(ex);
+            }
         }
 
         this.queue.push({
@@ -245,17 +253,17 @@ class JestMockPromise<T = any> {
      * @param onFinally finally handler function
      */
     public finally(onFinally:AnyFunction) {
-        let nextPromise:JestMockPromise;
+        let nextPromise:JestMockPromise = new JestMockPromise();
 
         // if the promise is already resolved or rejected
         // > call the handler right away
         if(this.state !== PromiseState.pending) {
-            // ToDo: što ako `onFinally` baci grešku???
-            onFinally();
-            nextPromise = new JestMockPromise();
-            nextPromise.resolve(this.value);
-        } else {
-            nextPromise = new JestMockPromise();
+            try {
+                onFinally();
+                nextPromise.resolve(this.value);
+            } catch(ex:any) {
+                nextPromise.reject(ex);
+            }
         }
 
         this.queue.push({
