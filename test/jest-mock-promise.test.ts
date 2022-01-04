@@ -352,7 +352,6 @@ test('if promise is pre-resolved and and there are multiple `then` handlers each
     expect(thirdHandler.mock.calls).toEqual([['2nd return value']]);
 });
 
-
 test('if multiple handlers have been attached to same promise, all should be resolved', () => {
     const promise = new JestMockPromise<string>();
 
@@ -389,4 +388,116 @@ test('if multiple handlers have been attached to same promise, all should be res
 
     expect(handlerC.mock.calls.length).toEqual(1);
     expect(handlerC.mock.calls).toEqual([['original data']]);
+});
+
+test('for a pre-resolved promise if THEN handlers throws an error the next promise must be rejected', () => {
+    const promise = new JestMockPromise();
+
+    promise.resolve("some value");
+
+    const firstHandler = () => { throw new Error('some error') };
+    const secondHandler = jest.fn();
+    const rejectionHandler = jest.fn();
+
+    promise
+        .then(firstHandler)
+        .then(secondHandler)
+        .catch(rejectionHandler);
+
+
+    expect(secondHandler).not.toBeCalled();
+
+    expect(rejectionHandler.mock.calls.length).toEqual(1);
+    expect(rejectionHandler.mock.calls).toEqual([[new Error('some error')]]);
+});
+
+test('for a pre-rejected promise if CATCH handlers throws an error the next promise must be rejected', () => {
+    const promise = new JestMockPromise();
+
+    promise.reject("some error 1");
+
+    const firstHandler = jest.fn();
+    const secondHandler = jest.fn();
+    const catchHandler = jest.fn();
+
+    promise
+        .then(firstHandler)
+        .catch(() => { throw new Error('some error 2') })
+        .then(secondHandler)
+        .catch(catchHandler)
+
+
+    expect(firstHandler).not.toBeCalled();
+    expect(secondHandler).not.toBeCalled();
+
+    expect(catchHandler.mock.calls.length).toEqual(1);
+    expect(catchHandler.mock.calls).toEqual([[new Error('some error 2')]]);
+});
+
+test('for a pre-resolved promise FINALLY must be called', () => {
+    const promise = new JestMockPromise();
+
+    promise.resolve("some value");
+
+    const finalHandler = jest.fn();
+    const rejectionHandler = jest.fn();
+
+    promise
+        .finally(finalHandler)
+        .catch(rejectionHandler);
+
+
+    expect(finalHandler.mock.calls.length).toEqual(1);
+    expect(finalHandler.mock.calls).toEqual([[]]);
+
+    expect(rejectionHandler).not.toBeCalled();
+});
+
+test('for a pre-resolved promise if FINALLY throws an error, next promise must be rejected', () => {
+    const promise = new JestMockPromise();
+
+    promise.resolve("some value");
+
+    const rejectionHandler = jest.fn();
+
+    promise
+        .finally( () => {throw new Error("some error")} )
+        .catch(rejectionHandler);
+
+    expect(rejectionHandler.mock.calls.length).toEqual(1);
+    expect(rejectionHandler.mock.calls).toEqual([[new Error('some error')]]);
+});
+
+test('for a pre-rejected promise FINALLY must be called', () => {
+    const promise = new JestMockPromise();
+
+    promise.reject("some error");
+
+    const finalHandler = jest.fn();
+    const rejectionHandler = jest.fn();
+
+    promise
+        .finally(finalHandler)
+        .catch(rejectionHandler);
+
+
+    expect(finalHandler.mock.calls.length).toEqual(1);
+    expect(finalHandler.mock.calls).toEqual([[]]);
+
+    expect(rejectionHandler).not.toBeCalled();
+});
+
+test('for a pre-rejected promise if FINALLY throws an error, next promise must be rejected', () => {
+    const promise = new JestMockPromise();
+
+    promise.reject("initial error");
+
+    const rejectionHandler = jest.fn();
+
+    promise
+        .finally( () => {throw new Error("additional error")} )
+        .catch(rejectionHandler);
+
+    expect(rejectionHandler.mock.calls.length).toEqual(1);
+    expect(rejectionHandler.mock.calls).toEqual([[new Error('additional error')]]);
 });
