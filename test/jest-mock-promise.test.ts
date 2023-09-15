@@ -501,3 +501,25 @@ test('for a pre-rejected promise if FINALLY throws an error, next promise must b
     expect(rejectionHandler.mock.calls.length).toEqual(1);
     expect(rejectionHandler.mock.calls).toEqual([[new Error('additional error')]]);
 });
+
+test('it is assignable as a real Promise', () => {
+    const results: string[] = [];
+
+    const somePromisingFunction = (action: Promise<string>) => {
+        action.then((value: string) => {
+            results.push(value);
+        });
+    };
+
+    const promise = new JestMockPromise<string>();
+    somePromisingFunction(promise);
+
+    promise.resolve("A value");
+
+    expect(results).toContain("A value");
+});
+
+test('it behaves like a JavaScript object', () => {
+    const result = Object.prototype.toString.call(new JestMockPromise());
+    expect(result).toEqual("[object JestMockPromise]");
+});

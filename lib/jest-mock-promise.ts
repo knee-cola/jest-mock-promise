@@ -68,6 +68,10 @@ class JestMockPromise<T = any> {
         }
     }
 
+    get [Symbol.toStringTag]() {
+        return "JestMockPromise";
+    }
+
     /**
      * Resolves promises at a given level
      * @param currLevel list of promises which need to be resolved at this level
